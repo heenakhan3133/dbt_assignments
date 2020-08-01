@@ -1,0 +1,367 @@
+-- assignment 06
+SELECT *
+FROM orders
+WHERE Odate='1990-10-03'
+  OR Odate='1990-10-04';
+
+SELECT *
+FROM customers
+WHERE Snum IN
+    (SELECT Snum
+     FROM salespeople
+     WHERE Sname='Peel'
+       OR Sname='Motika');
+  
+
+
+
+SELECT *
+FROM customers
+WHERE Cname LIKE 'C%';
+
+
+SELECT *
+FROM orders
+ WHERE (Amt IS NOT NULL 
+ AND (Amt != 0));
+
+-- 7th assignment
+
+SELECT count(Onum) total_order
+FROM orders
+WHERE Odate LIKE '1990-10-03%';
+
+
+SELECT count(Cname) empty_city
+FROM customers
+WHERE Cname IS NOT NULL;
+
+
+
+SELECT *
+FROM customers
+WHERE Cname LIKE 'G%'
+ORDER BY Cname;
+
+SELECT max(rating) "highest rating"
+FROM customers;
+
+SELECT count(Odate)||' SALES PERSON REGISTREDDON' "TOTAL",
+       Odate
+FROM orders
+GROUP BY Odate;
+-- 8th assignment
+
+SELECT Onum,
+       Snum,
+       Amt,
+       (Amt*12)/100 commision
+FROM orders;
+
+SELECT Rating,
+       Cname,
+       Snum
+FROM customers
+ORDER BY rating DESC;
+
+SELECT count(Odate) "TOTAL ORDERS",
+       Odate
+FROM orders
+GROUP BY Odate
+ORDER BY "TOTAL ORDERS";
+-- 9th assignment
+
+
+-- Q1)Write a query that lists each order number followed by the name of the customer who made the order.
+SELECT Onum,
+       Cname
+FROM Orders o,
+     customers c
+WHERE c.Cnum=o.Cnum ;
+
+-- Write a query that gives the names of both the salesperson and the customer for each order along with the order number.
+
+SELECT sname,
+       cname,
+       onum
+FROM orders o,
+     customers c,
+     salespeople s
+WHERE o.snum=c.snum
+  AND o.snum=s.snum;
+ 
+-- Write a query that produces all customers serviced by salespeople with a commission above 12%. Output the customer’s name, the salesperson’s name, and the salesperson’s rate of commission.
+ 
+SELECT cname,
+       s.snum,
+       comm*100 "RATE OF COMM."
+FROM customers c,
+     salespeople s
+WHERE c.snum=s.snum
+  AND comm>.12 ;
+ 
+ 
+ 
+ SELECT cname,
+       snum,
+       comm*100 "RATE OF COMM."
+FROM customers
+JOIN salespeople USING (snum)
+WHERE comm>.12;
+
+         
+         
+ --  Write a query that calculates the amount of the salesperson’s commission on each order by a customer with a rating above 100.
+ 
+SELECT amt,
+       comm
+FROM salespeople
+JOIN customers using(snum)
+JOIN orders using(snum)
+WHERE rating>100;
+ select * from customers;
+    
+-- 10th assignment 
+
+--  Write a query that produces all pairs of salespeople who are living in the same city. Exclude combinations of salespeople with themselves as well as duplicate rows with the order reversed.
+
+SELECT DISTINCT s1.sname ,s2.sname
+FROM salespeople s1,salespeople s2
+WHERE s1.sname > s2.sname AND s1.city=s2.city;
+
+
+-- Write a query that produces the names and cities of all customers with the same rating as Hoffman.
+
+SELECT cname,
+       city
+FROM customers
+WHERE rating =
+    (SELECT rating
+     FROM customers
+     WHERE cname='hoffman');
+
+          -- 11th assignment
+          
+          SELECT onum "ALL ORDERS",
+       cnum
+FROM orders
+WHERE cnum=
+    (SELECT cnum
+     FROM customers
+     WHERE cname='cisneros');
+     
+     
+     
+     SELECT cname,
+       rating
+FROM customers
+WHERE cnum IN
+    (SELECT cnum
+     FROM orders
+     WHERE amt >
+         (SELECT avg(amt)
+          FROM orders));
+          
+          
+SELECT sum(amt)
+FROM orders
+GROUP BY snum
+HAVING sum(amt)>
+  (SELECT max(amt)
+   FROM orders);
+
+ SUM(AMT) 15382.07
+ 
+ -- Assignment – 12
+ 
+ SELECT *
+FROM customers
+WHERE rating >=ANY
+    ( SELECT rating
+     FROM customers
+     WHERE snum IN
+         ( SELECT snum
+          FROM salespeople
+          WHERE sname='serres' ) );
+          
+          
+          SELECT snum
+FROM salespeople
+WHERE (snum,
+       city) NOT IN
+    (SELECT snum,
+            city
+     FROM customers);
+     
+     SELECT *
+FROM orders
+WHERE amt> ANY
+    ( SELECT amt
+     FROM orders
+     WHERE cnum IN
+         ( SELECT cnum
+          FROM customers
+          WHERE city='london' ) );
+          
+          SELECT *
+FROM orders
+WHERE amt>
+    (SELECT min(amt)
+     FROM customers
+     NATURAL JOIN orders
+     WHERE city='london');
+     
+     
+     -- Assignment – 13
+
+SELECT cname,
+       city,
+       'HIGH RATING' RATING
+FROM customers
+WHERE rating>200
+UNION
+SELECT cname,
+       city,
+       'LOW RATING' RATING
+FROM customers
+WHERE rating <=200;
+
+
+SELECT sname,
+       snum,
+       cname
+FROM salespeople
+JOIN customers using(snum)
+WHERE snum IN
+    (SELECT snum
+     FROM customers
+     GROUP BY snum
+     HAVING count(snum)>1)
+ORDER BY sname,
+         cname;
+         
+         
+         SELECT Snum
+FROM salespeople
+WHERE City='San Jose'
+UNION
+SELECT DISTINCT Snum
+FROM orders
+WHERE Snum IN
+    (SELECT Snum
+     FROM orders
+     WHERE Odate LIKE '1990-10-03-%');
+     
+-- Assignment – 14
+
+INSERT INTO salespeople (city,sname,comm,snum)
+VALUES('San Jose',
+       'Blanco',
+       NULL,
+       1100
+       
+       
+       
+       SELECT *FROM orders;
+       
+       DELETE
+FROM orders
+WHERE Cnum IN
+    (SELECT Cnum
+     FROM customers
+     WHERE Cname='Clemens');
+     SELECT *
+FROM orders;
+
+-- 4) Salesperson Serres has left the company. Assign her customers to Motika.
+UPDATE customers
+SET snum=
+  (SELECT snum
+   FROM salespeople
+   WHERE sname='serres')
+WHERE snum =
+    (SELECT snum
+     FROM salespeople
+     WHERE sname='Motika');
+     
+     -- 15th assignment 
+     CREATE TABLE Multicast AS
+SELECT *
+FROM salespeople
+WHERE snum IN
+    (SELECT snum
+     FROM customers
+     GROUP BY snum
+     HAVING count(snum)>1);
+
+ -- 2 rows created.
+
+SELECT *
+FROM multicast;
+
+
+
+-- 2) Write a command that deletes all customers with no current orders.
+INSERT INTO customers
+VALUES(2012,
+       'rakesh',
+       'bikaner',
+       500,
+       1005);
+
+ -- 1 row created.
+
+DELETE customers
+WHERE cnum=ANY
+    (SELECT cnum
+     FROM orders
+     WHERE cnum NOT IN
+         (SELECT cnum
+          FROM customers));
+
+ -- 1 rows deleted.
+ 
+ 
+ UPDATE salespeople
+SET comm=comm*1.20
+WHERE snum IN
+    (SELECT snum
+     FROM orders
+     WHERE amt>300);
+
+ -- 5 rows updated.
+
+SELECT *
+FROM salespeople;
+
+
+-- Assignment – 16
+
+CREATE INDEX d_order ON orders(odate);
+
+
+-- 2) If the Orders table has already been created, how can you force the onum field to
+-- be unique (assume all current values are unique)?
+DESCRIBE orders;
+
+
+ALTER TABLE orders MODIFY onum CONSTRAINT o_pk PRIMARY KEY;
+
+ -- Table altered.
+ DESCRIBE orders;
+ 
+ 
+ 
+ -- 3rd 
+ CREATE INDEX I_DATE ON orders(odate);
+ 
+ 
+ -- Assignment – 17
+ 
+ create table order_new (
+	onum int(10),
+	cnum int(10),
+	snum int(10),
+	odate date not null,
+	 pk_orders primary key (onum,cnum,snum)
+	);
